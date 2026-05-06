@@ -260,3 +260,22 @@ body::before {
 .feature-item { display:flex; align-items:flex-start; gap:0.75rem; font-size:var(--fs-sm); }
 .feature-icon { width:24px; height:24px; border-radius:6px; background:rgba(67,233,123,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.15rem; }
 .feature-icon svg { width: 13px; height: 13px; }
+
+/* ── WORK ── */
+.work-grid { display:grid; grid-template-columns:1fr; gap:1.25rem; }
+.work-card { border-radius:16px; overflow:hidden; background:var(--surface); border:1px solid var(--border); transition:transform 0.3s, border-color 0.3s; }
+.work-card:hover { transform:translateY(-4px); border-color:rgba(255,255,255,0.13); }
+.work-thumb { aspect-ratio:16/9; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.work-card:nth-child(1) .work-thumb { background:linear-gradient(135deg,#10102e,#6c63ff2a); }
+.work-card:nth-child(2) .work-thumb { background:linear-gradient(135deg,#1a0808,#ff6b6b28); }
+.work-card:nth-child(3) .work-thumb { background:linear-gradient(135deg,#07120d,#43e97b28); }
+.work-card:nth-child(4) .work-thumb { background:linear-gradient(135deg,#130d04,#fab38728); }
+.work-thumb-inner { width:56%; height:56%; border:1px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; }
+.work-thumb-inner svg { width:40px; height:40px; opacity:0.65; }
+.work-tag { position:absolute; top:0.75rem; left:0.75rem; padding:0.25rem 0.75rem; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); border-radius:100px; font-size:var(--fs-xs); font-weight:600; letter-spacing:0.04em; }
+.work-body { padding:var(--sp-sm); display:flex; flex-direction:column; gap:0.5rem; }
+.work-body h3 { font-family:var(--font-display); font-size:var(--fs-base); font-weight:700; }
+.work-body p  { font-size:var(--fs-xs); color:var(--muted); }
+.work-footer  { display:flex; align-items:center; justify-content:space-between; margin-top:0.25rem; }
+.work-tech    { display:flex; gap:0.35rem; flex-wrap:wrap; }
+.tech-pill    { padding:0.2rem 0.6rem; background:var(--surface2); border-radius:100px; font-size:0.7rem; font-weight:600; color:var(--muted); }
