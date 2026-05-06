@@ -237,3 +237,26 @@ body::before {
 .service-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--fs-sm); font-weight: 600; color: var(--accent); transition: gap 0.2s; }
 .service-link:hover { gap: 0.7rem; }
 .service-link svg { width: 14px; height: 14px; }
+
+/* ── ABOUT ── */
+.about-section { padding: var(--sp-2xl) var(--sp-sm); background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.about-grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-xl); align-items: center; }
+.about-visual { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 4/3; background: var(--surface2); order: -1; }
+.code-window { width:100%; height:100%; padding: var(--sp-sm); font-family:'Courier New',monospace; font-size:var(--fs-xs); line-height:1.8; color:#cdd6f4; overflow:hidden; }
+.code-window .line { display:flex; gap:1rem; }
+.code-window .ln { color:#45475a; user-select:none; min-width:1.5rem; text-align:right; }
+.code-window .kw { color:#cba6f7; }
+.code-window .fn { color:#89b4fa; }
+.code-window .str { color:#a6e3a1; }
+.code-window .val { color:#fab387; }
+.code-window .cm { color:#6c7086; font-style:italic; }
+.code-window .sel { color:#f38ba8; }
+.code-title-bar { display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border); }
+.dot{width:12px;height:12px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.code-filename { font-size:var(--fs-xs); color:var(--muted); margin-left:0.5rem; }
+.about-content { display:flex; flex-direction:column; gap:var(--sp-sm); }
+.feature-list { display:flex; flex-direction:column; gap:0.75rem; margin-top:var(--sp-sm); }
+.feature-item { display:flex; align-items:flex-start; gap:0.75rem; font-size:var(--fs-sm); }
+.feature-icon { width:24px; height:24px; border-radius:6px; background:rgba(67,233,123,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.15rem; }
+.feature-icon svg { width: 13px; height: 13px; }
