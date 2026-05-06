@@ -319,3 +319,46 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
 .social-link { width:44px; height:44px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; transition:background 0.2s, border-color 0.2s; }
 .social-link svg { width:18px; height:18px; }
 .social-link:hover { background:var(--accent); border-color:var(--accent); }
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+@media(min-width:768px){
+  .navbar{padding:0 var(--sp-md)}
+  .hamburger{display:none}
+  .nav-links{display:flex}
+  .nav-cta{display:inline-flex}
+  .hero{padding:var(--sp-xl) var(--sp-md)}
+  .section{padding:var(--sp-2xl) var(--sp-md)}
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+  .about-section{padding:var(--sp-2xl) var(--sp-md)}
+  .about-grid{grid-template-columns:1fr 1fr}
+  .about-visual{order:0}
+  .work-grid{grid-template-columns:repeat(2,1fr)}
+  .testi-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:2fr 1fr 1fr}
+  .footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}
+}
+@media(min-width:1024px){
+  .navbar{padding:0 var(--sp-lg)}
+  .hero{padding:var(--sp-xl) var(--sp-lg)}
+  .section{padding:var(--sp-2xl) var(--sp-lg)}
+  .services-grid{grid-template-columns:repeat(3,1fr)}
+  .about-section{padding:var(--sp-2xl) var(--sp-lg)}
+  .about-grid{grid-template-columns:5fr 4fr;gap:var(--sp-2xl)}
+  .work-grid{grid-template-columns:repeat(3,1fr)}
+  .work-card:first-child{grid-column:span 2}
+  .testi-grid{grid-template-columns:repeat(3,1fr)}
+  .testimonials-section{padding:var(--sp-2xl) var(--sp-lg)}
+  .cta-section{padding:var(--sp-2xl) var(--sp-lg)}
+  footer{padding:var(--sp-xl) var(--sp-lg) var(--sp-md)}
+  .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}
+}
+@media(min-width:1280px){
+  .navbar,.hero,.section,.about-section,.testimonials-section,.cta-section,footer{
+    padding-left:clamp(var(--sp-lg),8vw,9rem);
+    padding-right:clamp(var(--sp-lg),8vw,9rem);
+  }
+}
+
+/* ── FOCUS & MOTION ── */
+:focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+@media(prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important} }
