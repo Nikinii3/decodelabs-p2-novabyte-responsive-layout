@@ -153,6 +153,65 @@
     </div>
   </section>
 
+  <!-- About section -->
+  <section id="about" class="about-section" aria-labelledby="about-heading">
+    <div class="about-grid">
+      <div class="about-visual" aria-hidden="true">
+        <div class="code-window">
+          <div class="code-title-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">responsive.css</span>
+          </div>
+          <div class="line"><span class="ln">1</span><span class="cm">/* Mobile-first base styles */</span></div>
+          <div class="line"><span class="ln">2</span><span class="sel">.container</span> {</div>
+          <div class="line"><span class="ln">3</span>&nbsp;&nbsp;<span class="kw">display</span>: <span class="val">grid</span>;</div>
+          <div class="line"><span class="ln">4</span>&nbsp;&nbsp;<span class="kw">grid-template-columns</span>: <span class="val">1fr</span>;</div>
+          <div class="line"><span class="ln">5</span>&nbsp;&nbsp;<span class="kw">gap</span>: <span class="fn">clamp</span>(<span class="str">1rem</span>, <span class="str">3vw</span>, <span class="str">2rem</span>);</div>
+          <div class="line"><span class="ln">6</span>}</div>
+          <div class="line"><span class="ln">7</span></div>
+          <div class="line"><span class="ln">8</span><span class="cm">/* Tablet breakpoint */</span></div>
+          <div class="line"><span class="ln">9</span><span class="kw">@media</span> (<span class="fn">min-width</span>: <span class="val">768px</span>) {</div>
+          <div class="line"><span class="ln">10</span>&nbsp;&nbsp;<span class="sel">.container</span> {</div>
+          <div class="line"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">grid-template-columns</span>:</div>
+          <div class="line"><span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">repeat</span>(<span class="val">2</span>, <span class="val">1fr</span>);</div>
+          <div class="line"><span class="ln">13</span>&nbsp;&nbsp;}</div>
+          <div class="line"><span class="ln">14</span>}</div>
+          <div class="line"><span class="ln">15</span></div>
+          <div class="line"><span class="ln">16</span><span class="cm">/* Desktop breakpoint */</span></div>
+          <div class="line"><span class="ln">17</span><span class="kw">@media</span> (<span class="fn">min-width</span>: <span class="val">1024px</span>) {</div>
+          <div class="line"><span class="ln">18</span>&nbsp;&nbsp;<span class="sel">.container</span> {</div>
+          <div class="line"><span class="ln">19</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">grid-template-columns</span>:</div>
+          <div class="line"><span class="ln">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">repeat</span>(<span class="val">3</span>, <span class="val">1fr</span>);</div>
+          <div class="line"><span class="ln">21</span>&nbsp;&nbsp;}</div>
+          <div class="line"><span class="ln">22</span>}</div>
+        </div>
+      </div>
+      <div class="about-content">
+        <p class="section-label">Our approach</p>
+        <h2 id="about-heading" class="section-title" style="margin-bottom:0">Content is Like Water — We Shape the Container</h2>
+        <p style="color:var(--muted);font-size:var(--fs-sm)">At NovaByte, we design from the content outward. Every layout decision starts with the smallest screen and elegantly expands — never the reverse.</p>
+        <div class="feature-list" role="list">
+          <div class="feature-item" role="listitem">
+            <div class="feature-icon"><svg><use href="#ico-check"/></svg></div>
+            <div><strong>Mobile-First Philosophy</strong> — Base CSS targets 320 px, enhancements layer up via min-width media queries.</div>
+          </div>
+          <div class="feature-item" role="listitem">
+            <div class="feature-icon"><svg><use href="#ico-check"/></svg></div>
+            <div><strong>Fluid Units Throughout</strong> — No hard-coded px layout values. We use %, rem, vw, and <code>clamp()</code>.</div>
+          </div>
+          <div class="feature-item" role="listitem">
+            <div class="feature-icon"><svg><use href="#ico-check"/></svg></div>
+            <div><strong>Grid + Flexbox Harmony</strong> — CSS Grid for page architecture; Flexbox for components within.</div>
+          </div>
+          <div class="feature-item" role="listitem">
+            <div class="feature-icon"><svg><use href="#ico-check"/></svg></div>
+            <div><strong>Zero-JS Navigation</strong> — Hamburger menus powered by the native <code>popover</code> API. Lightweight, accessible.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 
 </main>  
 
