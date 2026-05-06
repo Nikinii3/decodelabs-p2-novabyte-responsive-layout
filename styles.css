@@ -279,3 +279,19 @@ body::before {
 .work-footer  { display:flex; align-items:center; justify-content:space-between; margin-top:0.25rem; }
 .work-tech    { display:flex; gap:0.35rem; flex-wrap:wrap; }
 .tech-pill    { padding:0.2rem 0.6rem; background:var(--surface2); border-radius:100px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+
+/* ── TESTIMONIALS ── */
+.testimonials-section { padding:var(--sp-2xl) var(--sp-sm); background:var(--surface); border-top:1px solid var(--border); }
+.testi-grid { display:grid; grid-template-columns:1fr; gap:1.25rem; margin-top:var(--sp-xl); }
+.testi-card { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:var(--sp-md); display:flex; flex-direction:column; gap:var(--sp-sm); }
+.stars-row { display:flex; gap:3px; }
+.stars-row svg { width:15px; height:15px; }
+.testi-card blockquote { font-size:var(--fs-sm); color:var(--muted); line-height:1.75; font-style:italic; }
+.testi-author { display:flex; align-items:center; gap:0.75rem; margin-top:auto; }
+.avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem; flex-shrink:0; }
+.av-1{background:linear-gradient(135deg,#6c63ff,#a89fff)}
+.av-2{background:linear-gradient(135deg,#ff6b6b,#ffa0a0)}
+.av-3{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#0a2010}
+.testi-author div { display:flex; flex-direction:column; }
+.author-name { font-weight:600; font-size:var(--fs-sm); }
+.author-role { font-size:var(--fs-xs); color:var(--muted); }
