@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundWave — Music Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:   #080808;
+    --void:    #0f0f0f;
+    --surface: #161616;
+    --lift:    #1e1e1e;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #f0f0f0;
+    --muted:   #666;
+    --accent:  #ff3c3c;
+    --accent2: #ff8c3c;
+    --glow:    rgba(255,60,60,0.15);
+    --glow2:   rgba(255,140,60,0.1);
+    --sidebar-w: 260px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--black); color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w); z-index: 300;
+    background: var(--void);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.5rem;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 3rem;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(255,60,60,0.3);
+  }
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem; letter-spacing: 0.05em; color: var(--text);
+  }
+  .nav-group { margin-bottom: 2.5rem; }
+  .nav-group-label {
+    font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.8rem; padding: 0 0.5rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.65rem 0.75rem; border-radius: 6px;
+    font-size: 0.88rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 0.1rem;
+  }
+  .nav-item:hover { background: var(--surface); color: var(--text); }
+  .nav-item.active { background: rgba(255,60,60,0.1); color: var(--accent); }
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--accent);
+    color: white; font-size: 0.6rem; font-weight: 600;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sidebar-divider {
+    height: 1px; background: var(--border); margin: 0.5rem 0 1.5rem;
+  }
+  .now-playing {
+    margin-top: auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .now-playing::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,60,60,0.08), transparent);
+  }
+  .np-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.7rem; }
+  .np-track {
+    display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.8rem;
+  }
+  .np-art {
+    width: 38px; height: 38px; border-radius: 6px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .np-name { font-size: 0.82rem; font-weight: 600; }
+  .np-artist { font-size: 0.72rem; color: var(--muted); }
+  .np-progress { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 0.6rem; }
+  .np-fill {
+    height: 100%; width: 42%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .np-controls { display: flex; align-items: center; justify-content: center; gap: 1.2rem; }
+  .np-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; transition: color 0.15s; }
+  .np-btn:hover { color: var(--text); }
+  .np-play {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; cursor: pointer; border: none;
+    box-shadow: 0 0 12px rgba(255,60,60,0.4);
+    transition: box-shadow 0.2s, transform 0.15s;
+  }
+  .np-play:hover { box-shadow: 0 0 20px rgba(255,60,60,0.5); transform: scale(1.05); }
+
+  /* ── MOBILE HAMBURGER ── */
+  .hamburger {
+    display: none; position: fixed;
+    top: 1rem; left: 1rem; z-index: 400;
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px; cursor: pointer;
+  }
+  .hamburger span {
+    display: block; width: 18px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 250;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-rows: auto 1fr auto;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 50% 60% at 60% 30%, rgba(255,60,60,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 20% 80%, rgba(255,140,60,0.06) 0%, transparent 50%);
+  }
+  /* Animated waveform bg */
+  .hero-wave {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 200px; pointer-events: none; opacity: 0.15;
+  }
+  .hero-topbar {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-search {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 0.55rem 1.2rem;
+    flex: 1; max-width: 360px;
+  }
+  .topbar-search input {
+    background: none; border: none; outline: none;
+    font-family: inherit; font-size: 0.85rem; color: var(--text);
+    flex: 1;
+  }
+  .topbar-search input::placeholder { color: var(--muted); }
+  .topbar-right { display: flex; align-items: center; gap: 1rem; }
+  .topbar-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 0.5rem 1.2rem;
+    font-family: inherit; font-size: 0.8rem; font-weight: 500;
+    color: var(--text); cursor: pointer; transition: border-color 0.2s;
+  }
+  .topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .topbar-btn.primary {
+    background: var(--accent); border-color: var(--accent); color: white;
+    box-shadow: 0 0 16px rgba(255,60,60,0.25);
+  }
+  .topbar-btn.primary:hover { box-shadow: 0 0 24px rgba(255,60,60,0.4); }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; cursor: pointer;
+    border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .avatar:hover { border-color: var(--accent); }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 5rem 3rem 3rem;
+    display: grid; grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem; align-items: center;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.25);
+    border-radius: 100px; padding: 0.3rem 0.9rem;
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.2s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 9vw, 11rem);
+    line-height: 0.88; letter-spacing: 0.02em;
+    color: var(--text); margin-bottom: 1.5rem;
+    animation: fadeUp 0.7s 0.25s ease both;
+  }
+  .hero-title .accent { color: var(--accent); }
+  .hero-sub {
+    font-size: 1rem; line-height: 1.7; color: var(--muted);
+    max-width: 440px; margin-bottom: 2.5rem;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.7s 0.55s ease both; }
+  .btn-red {
+    background: var(--accent); color: white;
+    padding: 0.9rem 2.2rem; border-radius: 6px;
+    font-size: 0.88rem; font-weight: 600;
+    text-decoration: none; transition: box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 0 20px rgba(255,60,60,0.3);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-red:hover { box-shadow: 0 0 32px rgba(255,60,60,0.5); transform: translateY(-1px); }
+  .btn-border {
+    background: transparent; color: var(--text);
+    padding: 0.9rem 2.2rem; border-radius: 6px;
+    border: 1px solid var(--border); font-size: 0.88rem; font-weight: 500;
+    text-decoration: none; transition: border-color 0.2s, color 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-border:hover { border-color: var(--accent); color: var(--accent); }
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.7s 0.7s ease both;
+  }
+  .h-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; color: var(--text); line-height: 1;
+  }
+  .h-stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* Featured album */
+  .featured-album {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.5rem;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 60px rgba(255,60,60,0.04);
+    animation: fadeUp 0.9s 0.3s ease both;
+  }
+  .album-art {
+    width: 100%; aspect-ratio: 1; border-radius: 10px;
+    background: linear-gradient(135deg, #1a0a0a 0%, #3d0f0f 40%, #2a1a0a 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; margin-bottom: 1.2rem; position: relative; overflow: hidden;
+  }
+  .album-art::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 40%, rgba(255,60,60,0.2) 0%, transparent 60%);
+  }
+  .album-waveform {
+    position: absolute; bottom: 1rem; left: 1rem; right: 1rem;
+    height: 40px; display: flex; align-items: flex-end; gap: 3px;
+  }
+  .wv { border-radius: 2px 2px 0 0; background: rgba(255,60,60,0.5); min-width: 3px; }
+  .album-info { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+  .album-name { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .album-artist { font-size: 0.8rem; color: var(--muted); }
+  .play-fab {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: white;
+    box-shadow: 0 0 20px rgba(255,60,60,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .play-fab:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(255,60,60,0.6); }
+
+  /* ── TRENDING ── */
+  .trending {
+    padding: 4rem 3rem;
+    border-top: 1px solid var(--border);
+    position: relative; z-index: 2;
+  }
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .section-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 0.05em; color: var(--text);
+  }
+  .see-all {
+    font-size: 0.78rem; color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid rgba(255,60,60,0.3);
+    transition: border-color 0.2s;
+  }
+  .see-all:hover { border-color: var(--accent); }
+  .tracks { display: flex; flex-direction: column; gap: 0; }
+  .track {
+    display: grid; grid-template-columns: 32px 48px 1fr auto auto;
+    align-items: center; gap: 1rem; padding: 0.75rem 1rem;
+    border-radius: 8px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .track:hover { background: var(--surface); }
+  .track:hover .track-num { display: none; }
+  .track:hover .track-play { display: flex; }
+  .track-num { font-size: 0.85rem; color: var(--muted); text-align: center; }
+  .track-play {
+    display: none; align-items: center; justify-content: center;
+    font-size: 0.8rem; color: var(--accent);
+  }
+  .track-art {
+    width: 48px; height: 48px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .track-name { font-size: 0.9rem; font-weight: 500; }
+  .track-artist { font-size: 0.78rem; color: var(--muted); }
+  .track-meta { display: flex; align-items: center; gap: 0.5rem; }
+  .track-plays { font-size: 0.75rem; color: var(--muted); }
+  .track-heart { font-size: 0.85rem; color: var(--muted); cursor: pointer; transition: color 0.15s; }
+  .track-heart:hover { color: var(--accent); }
+  .track-dur { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 36px; text-align: right; }
+
+  /* ── GENRES ── */
+  .genres {
+    padding: 4rem 3rem;
+    border-top: 1px solid var(--border);
+  }
+  .genres-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-top: 2rem; }
+  .genre {
+    border-radius: 10px; padding: 1.5rem 1.2rem;
+    cursor: pointer; position: relative; overflow: hidden;
+    aspect-ratio: 1.5; display: flex; flex-direction: column; justify-content: flex-end;
+    transition: transform 0.25s, box-shadow 0.25s;
+    text-decoration: none; color: var(--text);
+  }
+  .genre:hover { transform: scale(1.02); }
+  .genre::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+  }
+  .genre-1 { background: linear-gradient(135deg, #1a0a2e, #3d1f5c); }
+  .genre-2 { background: linear-gradient(135deg, #0a1a0a, #1a3d1a); }
+  .genre-3 { background: linear-gradient(135deg, #1a0a0a, #4a1a00); }
+  .genre-4 { background: linear-gradient(135deg, #0a0a1a, #1a1a4a); }
+  .genre-icon { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; opacity: 0.6; }
+  .genre-name { position: relative; font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.05em; }
+  .genre-count { position: relative; font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 0.2rem; }
+
+  /* ── FEATURES ── */
+  .features-dark {
+    padding: 6rem 3rem;
+    background: var(--void);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .feats-grid {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 1.5rem; margin-top: 3rem;
+  }
+  .feat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem 1.8rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .feat:hover { border-color: rgba(255,60,60,0.3); transform: translateY(-2px); }
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; margin-bottom: 1.2rem;
+  }
+  .feat-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.6rem; }
+  .feat-desc { font-size: 0.85rem; line-height: 1.65; color: var(--muted); }
+
+  /* ── CTA ── */
+  .cta {
+    padding: 6rem 3rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255,60,60,0.1) 0%, transparent 70%);
+  }
+  .cta * { position: relative; z-index: 1; }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 8vw, 9rem);
+    line-height: 0.9; letter-spacing: 0.02em;
+    color: var(--text); margin-bottom: 1.5rem;
+  }
+  .cta-title span { color: var(--accent); }
+  .cta-sub { font-size: 1rem; color: var(--muted); margin-bottom: 2.5rem; }
+  .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .plan-cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-top: 3rem; }
+  .plan-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem 1.8rem;
+    min-width: 220px; text-align: left;
+    transition: border-color 0.3s;
+  }
+  .plan-card:hover { border-color: rgba(255,60,60,0.3); }
+  .plan-card.hot { border-color: rgba(255,60,60,0.4); background: linear-gradient(135deg, rgba(255,60,60,0.07), var(--surface)); }
+  .plan-name { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.7rem; }
+  .plan-price { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 1; color: var(--text); margin-bottom: 0.3rem; }
+  .plan-price sup { font-size: 1.2rem; vertical-align: super; }
+  .plan-period { font-size: 0.75rem; color: var(--muted); margin-bottom: 1.2rem; }
+  .plan-perks { list-style: none; }
+  .plan-perks li {
+    font-size: 0.82rem; color: var(--muted); padding: 0.4rem 0;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .plan-perks li::before { content: '♪'; color: var(--accent); font-size: 0.7rem; }
+  .plan-btn {
+    display: block; margin-top: 1.5rem;
+    text-align: center; padding: 0.7rem; border-radius: 6px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .plan-btn-fill { background: var(--accent); color: white; }
+  .plan-btn-fill:hover { box-shadow: 0 0 20px rgba(255,60,60,0.35); }
+  .plan-btn-ghost { border: 1px solid var(--border); color: var(--text); }
+  .plan-btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--void); padding: 2.5rem 3rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    margin-left: 0; /* footer spans below sidebar too */
+  }
+  .footer-logo { display: flex; align-items: center; gap: 0.5rem; }
+  .footer-logo span { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.05em; }
+  footer p { font-size: 0.75rem; color: var(--muted); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .sidebar-overlay.open { display: block; }
+    .hamburger { display: flex; }
+    .main { margin-left: 0; }
+    .hero-content { grid-template-columns: 1fr; padding: 4rem 1.5rem 2rem; }
+    .featured-album { max-width: 320px; margin: 0 auto; }
+    .hero-topbar { padding: 1rem 1.5rem; padding-left: 4rem; }
+    .genres-grid { grid-template-columns: repeat(2,1fr); }
+    .feats-grid { grid-template-columns: 1fr; }
+    .trending, .genres, .features-dark, .cta { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .cta-title { font-size: clamp(3rem, 12vw, 6rem); }
+    footer { flex-direction: column; gap: 1rem; padding: 2rem 1.5rem; }
+    .plan-cards { flex-direction: column; align-items: center; }
+    .track { grid-template-columns: 28px 40px 1fr auto; }
+    .track-plays { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="#" class="sidebar-logo">
+    <div class="logo-mark">🎵</div>
+    <div class="logo-text">SoundWave</div>
+  </a>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Discover</div>
+    <a href="#" class="nav-item active"><span class="nav-icon">🏠</span> Home</a>
+    <a href="#" class="nav-item"><span class="nav-icon">🔍</span> Explore <div class="nav-badge">3</div></a>
+    <a href="#" class="nav-item"><span class="nav-icon">📻</span> Radio</a>
+    <a href="#" class="nav-item"><span class="nav-icon">🔥</span> Charts</a>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Library</div>
+    <a href="#" class="nav-item"><span class="nav-icon">💿</span> Playlists</a>
+    <a href="#" class="nav-item"><span class="nav-icon">❤️</span> Liked Songs</a>
+    <a href="#" class="nav-item"><span class="nav-icon">🎤</span> Artists</a>
+    <a href="#" class="nav-item"><span class="nav-icon">📂</span> Albums</a>
+    <a href="#" class="nav-item"><span class="nav-icon">⬇️</span> Downloads</a>
+  </div>
+
+  <div class="now-playing">
+    <div class="np-label">▶ Now Playing</div>
+    <div class="np-track">
+      <div class="np-art">🎸</div>
+      <div>
+        <div class="np-name">Eclipse</div>
+        <div class="np-artist">Nova Veil</div>
+      </div>
+    </div>
+    <div class="np-progress"><div class="np-fill"></div></div>
+    <div class="np-controls">
+      <button class="np-btn">⏮</button>
+      <button class="np-play">▶</button>
+      <button class="np-btn">⏭</button>
+    </div>
+  </div>
+</aside>
+
+<!-- HAMBURGER (mobile) -->
+<button class="hamburger" id="hamburger" aria-label="Toggle menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <svg class="hero-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,100 C100,60 200,140 300,100 C400,60 500,140 600,100 C700,60 800,140 900,100 C1000,60 1100,140 1200,100 L1200,200 L0,200Z" fill="url(#waveGrad)"/>
+      <defs>
+        <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff3c3c" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#ff8c3c" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="hero-topbar">
+      <div class="topbar-search">
+        <span style="color:var(--muted);font-size:0.85rem">🔍</span>
+        <input type="text" placeholder="Search songs, artists, albums…">
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn">Log In</button>
+        <button class="topbar-btn primary">Start Free</button>
+        <div class="avatar">👤</div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div>
+        <div class="hero-tag"><div class="live-dot"></div>Live Streaming Now</div>
+        <h1 class="hero-title">FEEL<br>THE<br><span class="accent">MUSIC.</span></h1>
+        <p class="hero-sub">A streaming platform with an adaptive interface — hamburger nav on mobile, full sidebar on desktop. 90M tracks. Zero compromises.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn-red">▶ Start Listening</a>
+          <a href="#" class="btn-border">🎙 Artist Portal</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="h-stat-val">90M</div>
+            <div class="h-stat-label">Tracks</div>
+          </div>
+          <div>
+            <div class="h-stat-val">180K</div>
+            <div class="h-stat-label">Artists</div>
+          </div>
+          <div>
+            <div class="h-stat-val">12M</div>
+            <div class="h-stat-label">Listeners</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="featured-album">
+        <div class="album-art">
+          🎶
+          <div class="album-waveform">
+            <div class="wv" style="height:30%"></div><div class="wv" style="height:60%"></div>
+            <div class="wv" style="height:80%"></div><div class="wv" style="height:45%"></div>
+            <div class="wv" style="height:90%"></div><div class="wv" style="height:55%"></div>
+            <div class="wv" style="height:70%"></div><div class="wv" style="height:40%"></div>
+            <div class="wv" style="height:85%"></div><div class="wv" style="height:50%"></div>
+            <div class="wv" style="height:65%"></div><div class="wv" style="height:35%"></div>
+          </div>
+        </div>
+        <div class="album-info">
+          <div>
+            <div class="album-name">Neon Drift</div>
+            <div class="album-artist">The Architects · 2026</div>
+          </div>
+          <button class="play-fab">▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING TRACKS -->
+  <section class="trending">
+    <div class="section-head">
+      <div class="section-h2">Trending Now</div>
+      <a href="#" class="see-all">See all →</a>
+    </div>
+    <div class="tracks">
+      <div class="track">
+        <div class="track-num">1</div>
+        <div class="track-play">▶</div>
+        <div class="track-art" style="background:linear-gradient(135deg,#3d0a0a,#6b1a1a)">🔥</div>
+        <div><div class="track-name">Blood Moon</div><div class="track-artist">Vex Hollow</div></div>
+        <div class="track-meta"><span class="track-plays">4.2M</span><span class="track-heart">♡</span></div>
+        <div class="track-dur">3:42</div>
+      </div>
+      <div class="track">
+        <div class="track-num">2</div>
+        <div class="track-play">▶</div>
+        <div class="track-art" style="background:linear-gradient(135deg,#0a1a3d,#1a2a6b)">🌊</div>
+        <div><div class="track-name">Deep Current</div><div class="track-artist">Sola Rift</div></div>
+        <div class="track-meta"><span class="track-plays">3.8M</span><span class="track-heart">♡</span></div>
+        <div class="track-dur">4:11</div>
+      </div>
+      <div class="track">
+        <div class="track-num">3</div>
+        <div class="track-play">▶</div>
+        <div class="track-art" style="background:linear-gradient(135deg,#1a0a3d,#3d1a6b)">⚡</div>
+        <div><div class="track-name">Static Dream</div><div class="track-artist">Nova Veil</div></div>
+        <div class="track-meta"><span class="track-plays">3.1M</span><span class="track-heart">♡</span></div>
+        <div class="track-dur">3:58</div>
+      </div>
+      <div class="track">
+        <div class="track-num">4</div>
+        <div class="track-play">▶</div>
+        <div class="track-art" style="background:linear-gradient(135deg,#0a2a1a,#1a5c2a)">🌿</div>
+        <div><div class="track-name">Chlorophyll</div><div class="track-artist">Earthen Pulse</div></div>
+        <div class="track-meta"><span class="track-plays">2.6M</span><span class="track-heart">♡</span></div>
+        <div class="track-dur">5:03</div>
+      </div>
+      <div class="track">
+        <div class="track-num">5</div>
+        <div class="track-play">▶</div>
+        <div class="track-art" style="background:linear-gradient(135deg,#2a1a0a,#5c3a1a)">🏜️</div>
+        <div><div class="track-name">Canyon Echo</div><div class="track-artist">Dust & Wire</div></div>
+        <div class="track-meta"><span class="track-plays">2.2M</span><span class="track-heart">♡</span></div>
+        <div class="track-dur">4:27</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENRES -->
+  <section class="genres">
+    <div class="section-head">
+      <div class="section-h2 reveal">Browse Genres</div>
+      <a href="#" class="see-all">All genres →</a>
+    </div>
+    <div class="genres-grid">
+      <a href="#" class="genre genre-1 reveal">
+        <div class="genre-icon">🎸</div>
+        <div class="genre-name">Alternative</div>
+        <div class="genre-count">24K tracks</div>
+      </a>
+      <a href="#" class="genre genre-2 reveal">
+        <div class="genre-icon">🎹</div>
+        <div class="genre-name">Electronic</div>
+        <div class="genre-count">38K tracks</div>
+      </a>
+      <a href="#" class="genre genre-3 reveal">
+        <div class="genre-icon">🥁</div>
+        <div class="genre-name">Hip Hop</div>
+        <div class="genre-count">51K tracks</div>
+      </a>
+      <a href="#" class="genre genre-4 reveal">
+        <div class="genre-icon">🎻</div>
+        <div class="genre-name">Ambient</div>
+        <div class="genre-count">12K tracks</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-dark">
+    <div class="section-head">
+      <div class="section-h2 reveal">Built for Listeners</div>
+    </div>
+    <div class="feats-grid">
+      <div class="feat reveal">
+        <div class="feat-icon">📱</div>
+        <div class="feat-title">Adaptive Interface</div>
+        <p class="feat-desc">Hamburger nav on mobile with a full expanded sidebar on desktop. The layout responds intelligently using CSS Grid and Popover API.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🎚️</div>
+        <div class="feat-title">Hi-Fi Streaming</div>
+        <p class="feat-desc">320kbps MP3 standard. Lossless FLAC for Premium listeners. Real-time equalizer with 10-band adjustment.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">AI Radio</div>
+        <p class="feat-desc">Describe a mood, a place, a memory. Our model builds a live station from 90M tracks that evolves as you listen.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">📡</div>
+        <div class="feat-title">Offline Mode</div>
+        <p class="feat-desc">Download up to 10,000 tracks for offline listening. Smart cache management keeps storage under control.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">👥</div>
+        <div class="feat-title">Social Listening</div>
+        <p class="feat-desc">Listen with friends in real time. Share queues, react to tracks, and see what people you follow are playing now.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🎤</div>
+        <div class="feat-title">Artist Portal</div>
+        <p class="feat-desc">Upload, distribute, and earn. Direct listener payments with real-time streaming analytics and fan engagement tools.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / PRICING -->
+  <section class="cta">
+    <h2 class="cta-title reveal">YOUR<br>NEXT<br><span>OBSESSION</span><br>AWAITS.</h2>
+    <p class="cta-sub reveal">Try free for 3 months. Cancel any time.</p>
+    <div class="plan-cards">
+      <div class="plan-card reveal">
+        <div class="plan-name">Free</div>
+        <div class="plan-price"><sup>$</sup>0</div>
+        <div class="plan-period">forever</div>
+        <ul class="plan-perks">
+          <li>90M tracks</li>
+          <li>Ads between songs</li>
+          <li>Shuffle play</li>
+          <li>Mobile only</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-ghost">Get Started</a>
+      </div>
+      <div class="plan-card hot reveal">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price"><sup>$</sup>9</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-perks">
+          <li>Ad-free listening</li>
+          <li>Offline downloads</li>
+          <li>Lossless audio</li>
+          <li>All devices</li>
+          <li>AI Radio</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-fill">Start Free Trial</a>
+      </div>
+      <div class="plan-card reveal">
+        <div class="plan-name">Duo</div>
+        <div class="plan-price"><sup>$</sup>14</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-perks">
+          <li>2 Premium accounts</li>
+          <li>Duo Mix playlist</li>
+          <li>All Premium features</li>
+          <li>Family controls</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-ghost">Choose Duo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <div class="logo-mark" style="width:24px;height:24px;font-size:0.7rem">🎵</div>
+      <span>SoundWave</span>
+    </div>
+    <p>© 2026 SoundWave. Built with CSS Grid, Popover API & passion.</p>
+  </footer>
+
+</main>
+
+<script>
+  // Hamburger / sidebar toggle
+  const ham = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+
+  ham.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    ham.classList.toggle('open', open);
+    overlay.classList.toggle('open', open);
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    ham.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Track heart toggle
+  document.querySelectorAll('.track-heart').forEach(h => {
+    h.addEventListener('click', () => {
+      h.textContent = h.textContent === '♡' ? '♥' : '♡';
+      h.style.color = h.textContent === '♥' ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>

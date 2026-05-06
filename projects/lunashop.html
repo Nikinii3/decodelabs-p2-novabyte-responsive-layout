@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LunaShop — Headless Storefront</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d10;
+    --cream: #f5f0e8;
+    --warm: #e8dcc8;
+    --gold: #c9a96e;
+    --gold-light: #e8c98a;
+    --muted: #7a7570;
+    --accent: #2d1f3d;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: rgba(245,240,232,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(201,169,110,0.2);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink); color: var(--cream);
+    padding: 0.6rem 1.5rem; border-radius: 2px;
+    font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+    overflow: hidden;
+  }
+  .hero-left {
+    padding: 7rem 3rem 5rem 5rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.8rem;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 2rem; height: 1px; background: var(--gold);
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    font-weight: 900; line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em { font-style: italic; color: var(--gold); }
+  .hero-sub {
+    font-size: 1.05rem; line-height: 1.7; color: var(--muted);
+    max-width: 420px; margin-bottom: 2.5rem;
+  }
+  .hero-actions { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--ink); color: var(--cream);
+    padding: 1rem 2.2rem; border-radius: 2px;
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none;
+    border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-secondary {
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--ink); text-decoration: none;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:hover { color: var(--gold); border-color: var(--gold); }
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    padding-top: 2rem; border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700; color: var(--ink);
+  }
+  .stat-val span { color: var(--gold); }
+  .stat-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
+
+  /* ── HERO RIGHT (visual) ── */
+  .hero-right {
+    position: relative; background: var(--ink);
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 40%, rgba(201,169,110,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45,31,61,0.6) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,169,110,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,169,110,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .hero-cards {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    height: 100%;
+    padding: 5rem 3rem;
+    gap: 1rem;
+  }
+  .product-card {
+    background: rgba(245,240,232,0.05);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 4px; padding: 1.2rem 1.4rem;
+    display: flex; align-items: center; gap: 1rem;
+    width: 100%; max-width: 340px;
+    backdrop-filter: blur(8px);
+    animation: floatCard 0s ease forwards;
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  .product-card:nth-child(1) { animation: slideIn 0.6s 0.2s ease forwards; }
+  .product-card:nth-child(2) { animation: slideIn 0.6s 0.4s ease forwards; margin-left: 2rem; }
+  .product-card:nth-child(3) { animation: slideIn 0.6s 0.6s ease forwards; }
+  .product-card:nth-child(4) { animation: slideIn 0.6s 0.8s ease forwards; margin-left: 1rem; }
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .card-img {
+    width: 48px; height: 48px; border-radius: 3px;
+    background: rgba(201,169,110,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; flex-shrink: 0;
+  }
+  .card-name { font-size: 0.85rem; font-weight: 500; color: var(--cream); }
+  .card-price { font-family: 'Playfair Display', serif; font-size: 0.9rem; color: var(--gold); }
+  .card-badge {
+    margin-left: auto; font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(201,169,110,0.2); color: var(--gold-light);
+    padding: 0.2rem 0.5rem; border-radius: 2px;
+  }
+  .score-pill {
+    position: absolute; top: 2rem; right: 2rem;
+    background: rgba(201,169,110,0.15);
+    border: 1px solid rgba(201,169,110,0.3);
+    border-radius: 100px; padding: 0.5rem 1rem;
+    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold-light); backdrop-filter: blur(8px);
+    animation: slideIn 0.6s 1s ease forwards; opacity: 0; transform: translateX(30px);
+  }
+  .score-pill strong { font-size: 1.2rem; font-family: 'Playfair Display', serif; }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 8rem 5rem;
+    background: var(--warm);
+    position: relative; overflow: hidden;
+  }
+  .features::before {
+    content: 'LUNA';
+    position: absolute; right: -2rem; top: -2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 20rem; font-weight: 900;
+    color: rgba(0,0,0,0.03); line-height: 1;
+    pointer-events: none; user-select: none;
+  }
+  .section-label {
+    display: flex; align-items: center; gap: 0.8rem;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.5rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--gold); opacity: 0.4; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 700; line-height: 1.1;
+    letter-spacing: -0.02em; max-width: 600px;
+    margin-bottom: 4rem;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0; border: 1px solid rgba(0,0,0,0.1);
+    position: relative; z-index: 1;
+  }
+  .feat {
+    padding: 2.5rem;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: background 0.3s;
+  }
+  .feat:nth-child(3n) { border-right: none; }
+  .feat:hover { background: rgba(201,169,110,0.08); }
+  .feat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem; color: var(--gold); font-weight: 700;
+    letter-spacing: 0.1em; margin-bottom: 1.2rem;
+  }
+  .feat-icon {
+    font-size: 1.8rem; margin-bottom: 1rem;
+  }
+  .feat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; font-weight: 700;
+    margin-bottom: 0.7rem;
+  }
+  .feat-desc { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+  /* ── TECH STACK ── */
+  .tech {
+    padding: 6rem 5rem;
+    background: var(--ink); color: var(--cream);
+    position: relative; overflow: hidden;
+  }
+  .tech::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 80% at 100% 50%, rgba(201,169,110,0.08) 0%, transparent 60%);
+  }
+  .tech-inner { position: relative; z-index: 1; }
+  .tech .section-label { color: var(--gold-light); }
+  .tech .section-title { color: var(--cream); }
+  .tags {
+    display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 4rem;
+  }
+  .tag {
+    padding: 0.5rem 1.1rem; border: 1px solid rgba(201,169,110,0.3);
+    border-radius: 2px; font-size: 0.8rem; font-weight: 500;
+    letter-spacing: 0.06em; color: var(--gold-light);
+    transition: background 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .tag:hover { background: rgba(201,169,110,0.1); border-color: var(--gold); }
+
+  .metrics-row {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px; background: rgba(201,169,110,0.15);
+  }
+  .metric {
+    background: var(--ink); padding: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .metric::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .metric:hover::after { transform: scaleX(1); }
+  .metric-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 900; color: var(--cream);
+    line-height: 1;
+  }
+  .metric-val sup { font-size: 1.2rem; color: var(--gold); vertical-align: super; }
+  .metric-label { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,240,232,0.5); margin-top: 0.5rem; }
+
+  /* ── TESTIMONIAL ── */
+  .testimonial {
+    padding: 7rem 5rem;
+    background: var(--cream);
+    display: grid; grid-template-columns: 1fr 1.5fr;
+    gap: 5rem; align-items: center;
+  }
+  .testi-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem; font-weight: 900; color: var(--gold);
+    line-height: 1; opacity: 0.3;
+  }
+  .testi-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-style: italic;
+    line-height: 1.4; margin-bottom: 1.5rem;
+    color: var(--ink);
+  }
+  .testi-author { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); }
+  .testi-author strong { color: var(--ink); }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 7rem 5rem;
+    background: var(--gold);
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(255,255,255,0.05) 20px,
+      rgba(255,255,255,0.05) 21px
+    );
+  }
+  .cta-section * { position: relative; z-index: 1; }
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    font-weight: 900; color: var(--ink);
+    line-height: 1.05; letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+  .cta-sub { font-size: 1rem; color: rgba(13,13,16,0.7); margin-bottom: 2.5rem; }
+  .cta-actions { display: flex; align-items: center; justify-content: center; gap: 1.5rem; }
+  .btn-dark {
+    background: var(--ink); color: var(--cream);
+    padding: 1rem 2.5rem; border-radius: 2px;
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .btn-dark:hover { background: var(--accent); }
+  .btn-outline-dark {
+    padding: 1rem 2.5rem; border-radius: 2px;
+    border: 2px solid var(--ink);
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; color: var(--ink);
+    transition: background 0.2s;
+  }
+  .btn-outline-dark:hover { background: rgba(13,13,16,0.08); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: rgba(245,240,232,0.5);
+    padding: 3rem 5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700; color: var(--cream);
+  }
+  .footer-logo span { color: var(--gold); }
+  footer p { font-size: 0.8rem; }
+
+  /* ── ANIMATIONS ── */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-right { height: 400px; }
+    .hero-left { padding: 5rem 2rem 3rem; }
+    .features { padding: 5rem 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feat:nth-child(3n) { border-right: 1px solid rgba(0,0,0,0.1); }
+    .feat { border-right: none; }
+    .metrics-row { grid-template-columns: 1fr 1fr; }
+    .tech, .testimonial, .cta-section { padding: 4rem 2rem; }
+    .testimonial { grid-template-columns: 1fr; gap: 2rem; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Luna<span>Shop</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Performance</a></li>
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <a href="#" class="nav-cta">View on GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Headless E-Commerce</div>
+    <h1 class="hero-title">
+      Commerce<br>at <em>Lunar</em><br>Speed.
+    </h1>
+    <p class="hero-sub">
+      A zero-layout-shift, mobile-first storefront serving 50k daily users. Built for performance, designed for conversion.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">View Live Demo</a>
+      <a href="#" class="btn-secondary">Read Case Study →</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-val">98<span>/100</span></div>
+        <div class="stat-label">Lighthouse Score</div>
+      </div>
+      <div>
+        <div class="stat-val">50<span>k</span></div>
+        <div class="stat-label">Daily Users</div>
+      </div>
+      <div>
+        <div class="stat-val">0<span>ms</span></div>
+        <div class="stat-label">Layout Shift</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-grid"></div>
+    <div class="score-pill"><strong>98</strong> Lighthouse</div>
+    <div class="hero-cards">
+      <div class="product-card">
+        <div class="card-img">🧴</div>
+        <div>
+          <div class="card-name">Radiance Serum</div>
+          <div class="card-price">$48.00</div>
+        </div>
+        <div class="card-badge">New</div>
+      </div>
+      <div class="product-card">
+        <div class="card-img">👜</div>
+        <div>
+          <div class="card-name">Evening Tote</div>
+          <div class="card-price">$124.00</div>
+        </div>
+        <div class="card-badge">Best</div>
+      </div>
+      <div class="product-card">
+        <div class="card-img">🕯️</div>
+        <div>
+          <div class="card-name">Amber Candle</div>
+          <div class="card-price">$36.00</div>
+        </div>
+        <div class="card-badge">Sale</div>
+      </div>
+      <div class="product-card">
+        <div class="card-img">🎁</div>
+        <div>
+          <div class="card-name">Gift Bundle</div>
+          <div class="card-price">$89.00</div>
+        </div>
+        <div class="card-badge">Popular</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">What We Built</div>
+  <h2 class="section-title reveal">A storefront that earns its keep in every metric.</h2>
+  <div class="features-grid">
+    <div class="feat reveal">
+      <div class="feat-num">01</div>
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Zero Layout Shift</div>
+      <p class="feat-desc">Every element reserves its space before render. CLS score of absolute zero — images, fonts, and dynamic content all locked in.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-num">02</div>
+      <div class="feat-icon">📱</div>
+      <div class="feat-title">Mobile First</div>
+      <p class="feat-desc">Designed from 320px up. Touch-optimized interactions, viewport-aware images, and thumb-friendly cart flows.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-num">03</div>
+      <div class="feat-icon">🧩</div>
+      <div class="feat-title">Headless Architecture</div>
+      <p class="feat-desc">Decoupled frontend consuming a commerce API. Swap backends without touching the UI. Full control over every pixel.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-num">04</div>
+      <div class="feat-icon">🔍</div>
+      <div class="feat-title">SEO Optimized</div>
+      <p class="feat-desc">Server-side rendered product pages, structured data markup, canonical URLs, and dynamic OG images for every product.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-num">05</div>
+      <div class="feat-icon">🛒</div>
+      <div class="feat-title">Instant Cart</div>
+      <p class="feat-desc">Optimistic UI updates, persistent cart state, and frictionless checkout — all without a full page reload.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-num">06</div>
+      <div class="feat-icon">🎨</div>
+      <div class="feat-title">Design System</div>
+      <p class="feat-desc">Consistent token-based design across all 120+ components. Dark mode, brand themes, and accessibility baked in from day one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="tech">
+  <div class="tech-inner">
+    <div class="section-label">Tech Stack</div>
+    <h2 class="section-title reveal">Built on tools<br>that scale.</h2>
+    <div class="tags">
+      <span class="tag">HTML5</span>
+      <span class="tag">CSS Grid</span>
+      <span class="tag">Vanilla JS</span>
+      <span class="tag">Web Components</span>
+      <span class="tag">Service Workers</span>
+      <span class="tag">Intersection Observer</span>
+      <span class="tag">Headless CMS</span>
+      <span class="tag">REST API</span>
+      <span class="tag">CDN Edge Delivery</span>
+    </div>
+    <div class="metrics-row">
+      <div class="metric">
+        <div class="metric-val">98<sup>+</sup></div>
+        <div class="metric-label">Lighthouse Score</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">0<sup>ms</sup></div>
+        <div class="metric-label">Cumulative Layout Shift</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">1.2<sup>s</sup></div>
+        <div class="metric-label">Time to Interactive</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">50<sup>k</sup></div>
+        <div class="metric-label">Daily Active Users</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="testi-label">❝</div>
+  <div>
+    <p class="testi-quote reveal">
+      "LunaShop redefined what we thought was possible for a commerce frontend. Our conversion rate went up 31% the week we launched."
+    </p>
+    <p class="testi-author">
+      <strong>Amara Nwosu</strong> — Head of Digital, Maison Éclat
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Ready to go headless?</h2>
+  <p class="cta-sub">Deploy a storefront that scores 98 on day one.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-dark">Get Started</a>
+    <a href="#" class="btn-outline-dark">Read the Docs</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Luna<span>Shop</span></div>
+  <p>© 2026 LunaShop. All rights reserved.</p>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+    { threshold: 0.15 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

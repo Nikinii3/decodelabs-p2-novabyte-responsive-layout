@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataPulse — Analytics Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0e1420;
+    --surface2: #131b2a;
+    --border: rgba(255,255,255,0.07);
+    --text: #e2eaf6;
+    --muted: #5a7090;
+    --cyan: #00d4ff;
+    --cyan-dim: rgba(0,212,255,0.12);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.1);
+    --orange: #ff7b3a;
+    --purple: #8b5cf6;
+    --white: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg); color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(7,11,18,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--white);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px var(--cyan); opacity: 1; }
+    50% { box-shadow: 0 0 16px var(--cyan), 0 0 32px rgba(0,212,255,0.3); opacity: 0.8; }
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.08em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-right { display: flex; gap: 1rem; align-items: center; }
+  .nav-login {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--muted); text-decoration: none;
+    letter-spacing: 0.08em; transition: color 0.2s;
+  }
+  .nav-login:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--cyan); color: var(--bg);
+    padding: 0.55rem 1.2rem; border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+    text-decoration: none; transition: box-shadow 0.2s;
+  }
+  .nav-cta:hover { box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    padding: 120px 3rem 5rem;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center;
+  }
+  /* Background elements */
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .hero-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 40%, rgba(0,212,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 30% 70%, rgba(139,92,246,0.05) 0%, transparent 60%);
+  }
+  .grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  .hero-inner {
+    position: relative; z-index: 2;
+    display: grid; grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem; align-items: center; width: 100%; max-width: 1300px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 100px; padding: 0.4rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: pulse 2s infinite; }
+  .hero-title {
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    font-weight: 800; line-height: 1.0;
+    letter-spacing: -0.03em; margin-bottom: 1.5rem;
+  }
+  .hero-title .grad {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1.05rem; line-height: 1.7; color: var(--muted);
+    max-width: 480px; margin-bottom: 2.5rem;
+    font-weight: 400;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-cyan {
+    background: var(--cyan); color: var(--bg);
+    padding: 0.9rem 2rem; border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em;
+    text-decoration: none; transition: box-shadow 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-cyan:hover { box-shadow: 0 0 30px rgba(0,212,255,0.35); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    padding: 0.9rem 2rem; border-radius: 4px;
+    border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em;
+    text-decoration: none; transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+  .hero-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+    margin-top: 1.2rem; letter-spacing: 0.04em;
+  }
+
+  /* Dashboard preview */
+  .dashboard-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    box-shadow:
+      0 0 60px rgba(0,212,255,0.07),
+      0 40px 80px rgba(0,0,0,0.5);
+    animation: floatUp 0.8s ease forwards; opacity: 0;
+  }
+  @keyframes floatUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+  .db-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .db-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .db-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; color: var(--muted); margin-left: auto;
+    letter-spacing: 0.06em;
+  }
+  .db-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .db-kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.6rem; }
+  .kpi {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.8rem;
+  }
+  .kpi-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+  .kpi-val { font-size: 1.2rem; font-weight: 800; }
+  .kpi-delta { font-family: 'Space Mono', monospace; font-size: 0.6rem; margin-top: 0.2rem; }
+  .up { color: var(--green); } .down { color: var(--orange); }
+  .db-chart-area {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1rem; height: 140px;
+    display: flex; align-items: flex-end; gap: 4px;
+    position: relative; overflow: hidden;
+  }
+  .chart-line {
+    position: absolute; inset: 0; padding: 0.5rem;
+  }
+  .bar {
+    flex: 1; border-radius: 2px 2px 0 0;
+    background: linear-gradient(to top, rgba(0,212,255,0.6), rgba(0,212,255,0.2));
+    min-width: 0;
+    animation: growBar 1s ease forwards;
+    transform-origin: bottom;
+  }
+  @keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+  .bar:nth-child(2) { height: 65%; animation-delay: 0.15s; }
+  .bar:nth-child(3) { height: 45%; animation-delay: 0.2s; }
+  .bar:nth-child(4) { height: 80%; animation-delay: 0.25s; }
+  .bar:nth-child(5) { height: 55%; animation-delay: 0.3s; }
+  .bar:nth-child(6) { height: 90%; animation-delay: 0.35s; background: linear-gradient(to top, var(--cyan), rgba(0,212,255,0.4)); }
+  .bar:nth-child(7) { height: 70%; animation-delay: 0.4s; }
+  .bar:nth-child(8) { height: 85%; animation-delay: 0.45s; }
+  .bar:nth-child(9) { height: 60%; animation-delay: 0.5s; }
+  .bar:nth-child(10) { height: 95%; animation-delay: 0.55s; background: linear-gradient(to top, var(--cyan), rgba(0,212,255,0.4)); }
+  .bar:nth-child(11) { height: 75%; animation-delay: 0.6s; }
+  .bar:nth-child(12) { height: 88%; animation-delay: 0.65s; }
+  .db-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .mini-stat {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.8rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .mini-icon { font-size: 1rem; }
+  .mini-label { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+  .mini-val { font-size: 0.9rem; font-weight: 700; }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 8rem 3rem;
+    position: relative;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .section-eyebrow::before { content: '//'; color: var(--muted); }
+  .section-title {
+    font-size: clamp(2.2rem, 3.5vw, 3.5rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.02em; max-width: 600px;
+    margin-bottom: 4rem;
+  }
+  .feats-grid {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden;
+  }
+  .feat {
+    background: var(--bg); padding: 2.5rem 2rem;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+  }
+  .feat::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feat:hover { background: var(--surface); }
+  .feat:hover::before { opacity: 1; }
+  .feat-icon {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: var(--cyan-dim); border: 1px solid rgba(0,212,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; margin-bottom: 1.2rem;
+  }
+  .feat-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.6rem; }
+  .feat-desc { font-size: 0.88rem; line-height: 1.65; color: var(--muted); font-weight: 400; }
+
+  /* ── DEMO ── */
+  .demo-section {
+    padding: 6rem 3rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-inner { max-width: 1300px; margin: 0 auto; }
+  .responsive-strip {
+    display: grid; grid-template-columns: 3fr 1.5fr 1fr;
+    gap: 1.5rem; align-items: start; margin-top: 3rem;
+  }
+  .screen {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+  .screen-bar {
+    height: 28px; background: var(--surface2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 0.8rem; gap: 0.4rem;
+  }
+  .screen-bar-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .screen-content { padding: 1rem; }
+  .screen-label {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    color: var(--muted); letter-spacing: 0.1em;
+    text-align: center; padding: 0.5rem; border-top: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+  .placeholder-chart {
+    height: 80px; background: var(--surface);
+    border-radius: 3px; margin-bottom: 0.6rem;
+    display: flex; align-items: flex-end;
+    gap: 2px; padding: 0.4rem;
+    overflow: hidden;
+  }
+  .pb { flex: 1; border-radius: 1px; background: rgba(0,212,255,0.3); }
+  .pb-h10 { height: 10%; } .pb-h30 { height: 30%; } .pb-h50 { height: 50%; }
+  .pb-h70 { height: 70%; } .pb-h90 { height: 90%; } .pb-h60 { height: 60%; }
+  .pb-h80 { height: 80%; } .pb-h40 { height: 40%; }
+  .highlight { background: var(--cyan) !important; }
+  .placeholder-row {
+    height: 8px; background: var(--surface); border-radius: 2px;
+    margin-bottom: 0.4rem;
+  }
+  .placeholder-row.w60 { width: 60%; }
+  .placeholder-row.w80 { width: 80%; }
+  .placeholder-row.w45 { width: 45%; }
+
+  /* ── PRICING ── */
+  .pricing {
+    padding: 8rem 3rem;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+  .plan {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 2.5rem 2rem;
+    position: relative; transition: border-color 0.3s;
+  }
+  .plan:hover { border-color: rgba(0,212,255,0.3); }
+  .plan.featured {
+    border-color: rgba(0,212,255,0.4);
+    background: linear-gradient(135deg, var(--surface2), var(--surface));
+  }
+  .plan.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--cyan); color: var(--bg);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+    padding: 0.25rem 0.8rem; border-radius: 100px;
+  }
+  .plan-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 1rem;
+  }
+  .plan-price {
+    font-size: 3rem; font-weight: 800; line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .plan-price sup { font-size: 1.2rem; vertical-align: super; }
+  .plan-period { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .plan-features { list-style: none; margin-bottom: 2rem; }
+  .plan-features li {
+    font-size: 0.88rem; color: var(--muted); padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0.6rem;
+    font-weight: 400;
+  }
+  .plan-features li::before { content: '→'; color: var(--cyan); flex-shrink: 0; }
+  .plan-btn {
+    display: block; text-align: center;
+    padding: 0.8rem; border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .plan-btn-outline {
+    border: 1px solid var(--border); color: var(--text);
+  }
+  .plan-btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+  .plan-btn-fill {
+    background: var(--cyan); color: var(--bg);
+  }
+  .plan-btn-fill:hover { box-shadow: 0 0 20px rgba(0,212,255,0.3); }
+
+  /* ── CTA ── */
+  .cta {
+    margin: 0 3rem 5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 5rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 60% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 70%);
+  }
+  .cta * { position: relative; z-index: 1; }
+  .cta-title {
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .cta-sub { font-size: 1rem; color: var(--muted); margin-bottom: 2.5rem; font-weight: 400; }
+  .cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem; font-weight: 700;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  footer p { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .dashboard-preview { margin-top: 2rem; }
+    .feats-grid, .plans, .responsive-strip { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero, .features, .demo-section, .pricing, .cta { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .cta { margin: 0 1.5rem 3rem; padding: 3rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><div class="logo-dot"></div>DataPulse</div>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Integrations</a></li>
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="nav-login">Sign In</a>
+    <a href="#" class="nav-cta">Start Free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge"><div class="badge-dot"></div>Now with AI-powered anomaly detection</div>
+      <h1 class="hero-title">
+        Analytics that<br><span class="grad">adapts to you.</span>
+      </h1>
+      <p class="hero-sub">
+        A responsive analytics interface with fluid charts adapting from mobile to ultrawide displays. Real-time insights, zero configuration.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn-cyan">Start Free Trial</a>
+        <a href="#" class="btn-ghost">View Demo →</a>
+      </div>
+      <p class="hero-note">// No credit card required. 14-day free trial.</p>
+    </div>
+
+    <div class="dashboard-preview">
+      <div class="db-header">
+        <div class="db-dot" style="background:#ff5f57"></div>
+        <div class="db-dot" style="background:#febc2e"></div>
+        <div class="db-dot" style="background:#28c840"></div>
+        <div class="db-title">datapulse — overview.dash</div>
+      </div>
+      <div class="db-body">
+        <div class="db-kpis">
+          <div class="kpi">
+            <div class="kpi-label">TOTAL REVENUE</div>
+            <div class="kpi-val" style="color:var(--cyan)">$2.4M</div>
+            <div class="kpi-delta up">↑ 18.4%</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">ACTIVE USERS</div>
+            <div class="kpi-val">84.2k</div>
+            <div class="kpi-delta up">↑ 7.1%</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">CHURN RATE</div>
+            <div class="kpi-val" style="color:var(--orange)">2.3%</div>
+            <div class="kpi-delta down">↓ 0.4%</div>
+          </div>
+        </div>
+        <div class="db-chart-area">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <div class="db-row2">
+          <div class="mini-stat">
+            <div class="mini-icon">📡</div>
+            <div>
+              <div class="mini-label">LIVE SESSIONS</div>
+              <div class="mini-val" style="color:var(--green)">1,284</div>
+            </div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-icon">⚡</div>
+            <div>
+              <div class="mini-label">AVG LOAD TIME</div>
+              <div class="mini-val">142ms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-eyebrow">Capabilities</div>
+  <h2 class="section-title reveal">Everything you need to<br>see the whole picture.</h2>
+  <div class="feats-grid">
+    <div class="feat reveal">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Fluid Chart Engine</div>
+      <p class="feat-desc">Charts built with SVG and Flexbox that reflow gracefully from 320px mobile to 5K ultrawide. Every data point stays readable.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-icon">🔴</div>
+      <div class="feat-title">Real-Time Streaming</div>
+      <p class="feat-desc">WebSocket-powered live data with configurable update intervals. Watch your metrics breathe in real time without a page refresh.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-icon">🤖</div>
+      <div class="feat-title">AI Anomaly Detection</div>
+      <p class="feat-desc">Machine learning models flag unusual patterns in your data before they become problems. Get notified the moment something looks off.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-icon">🗂️</div>
+      <div class="feat-title">Custom Dashboards</div>
+      <p class="feat-desc">Drag-and-drop layout builder with 40+ widget types. Create boards for every team, from C-suite summaries to engineering deep-dives.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-icon">🔗</div>
+      <div class="feat-title">100+ Integrations</div>
+      <p class="feat-desc">Connect Stripe, Segment, Salesforce, PostgreSQL, and more with one-click connectors. Your data, wherever it lives.</p>
+    </div>
+    <div class="feat reveal">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Role-Based Access</div>
+      <p class="feat-desc">Granular permissions per dashboard, per widget, per user. SOC 2 Type II certified. GDPR compliant. Your data stays yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RESPONSIVE DEMO -->
+<section class="demo-section">
+  <div class="demo-inner">
+    <div class="section-eyebrow">Responsive Design</div>
+    <h2 class="section-title reveal">One dashboard.<br>Every screen.</h2>
+    <div class="responsive-strip">
+      <div class="screen reveal">
+        <div class="screen-bar">
+          <div class="screen-bar-dot" style="background:#ff5f57"></div>
+          <div class="screen-bar-dot" style="background:#febc2e"></div>
+          <div class="screen-bar-dot" style="background:#28c840"></div>
+        </div>
+        <div class="screen-content">
+          <div class="placeholder-chart">
+            <div class="pb pb-h30"></div><div class="pb pb-h50"></div>
+            <div class="pb pb-h70"></div><div class="pb pb-h40"></div>
+            <div class="pb pb-h90 highlight"></div><div class="pb pb-h60"></div>
+            <div class="pb pb-h80"></div><div class="pb pb-h45" style="height:45%"></div>
+          </div>
+          <div class="placeholder-row w80"></div>
+          <div class="placeholder-row w60"></div>
+        </div>
+        <div class="screen-label">Desktop / Ultrawide</div>
+      </div>
+      <div class="screen reveal">
+        <div class="screen-bar">
+          <div class="screen-bar-dot" style="background:#ff5f57"></div>
+          <div class="screen-bar-dot" style="background:#febc2e"></div>
+        </div>
+        <div class="screen-content">
+          <div class="placeholder-chart" style="height:60px">
+            <div class="pb pb-h50"></div><div class="pb pb-h80"></div>
+            <div class="pb pb-h60"></div><div class="pb pb-h90 highlight"></div>
+            <div class="pb pb-h70"></div>
+          </div>
+          <div class="placeholder-row w80"></div>
+          <div class="placeholder-row w45"></div>
+        </div>
+        <div class="screen-label">Tablet</div>
+      </div>
+      <div class="screen reveal">
+        <div class="screen-bar">
+          <div class="screen-bar-dot" style="background:#ff5f57"></div>
+        </div>
+        <div class="screen-content">
+          <div class="placeholder-chart" style="height:50px">
+            <div class="pb pb-h60"></div><div class="pb pb-h90 highlight"></div>
+            <div class="pb pb-h40"></div>
+          </div>
+          <div class="placeholder-row" style="width:100%"></div>
+          <div class="placeholder-row w60"></div>
+        </div>
+        <div class="screen-label">Mobile</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="section-eyebrow">Pricing</div>
+  <h2 class="section-title reveal">Simple, transparent<br>pricing.</h2>
+  <div class="plans">
+    <div class="plan reveal">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price"><sup>$</sup>0</div>
+      <div class="plan-period">// free forever</div>
+      <ul class="plan-features">
+        <li>3 dashboards</li>
+        <li>5 data sources</li>
+        <li>7-day data history</li>
+        <li>1 team member</li>
+      </ul>
+      <a href="#" class="plan-btn plan-btn-outline">Get Started</a>
+    </div>
+    <div class="plan featured reveal">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><sup>$</sup>49</div>
+      <div class="plan-period">// per month, billed annually</div>
+      <ul class="plan-features">
+        <li>Unlimited dashboards</li>
+        <li>50 data sources</li>
+        <li>1-year data history</li>
+        <li>10 team members</li>
+        <li>AI anomaly detection</li>
+        <li>Custom alerts</li>
+      </ul>
+      <a href="#" class="plan-btn plan-btn-fill">Start Free Trial</a>
+    </div>
+    <div class="plan reveal">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">Custom</div>
+      <div class="plan-period">// contact us</div>
+      <ul class="plan-features">
+        <li>Everything in Pro</li>
+        <li>Unlimited sources</li>
+        <li>Unlimited history</li>
+        <li>SSO & SAML</li>
+        <li>Dedicated support</li>
+        <li>SLA guarantee</li>
+      </ul>
+      <a href="#" class="plan-btn plan-btn-outline">Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta reveal">
+  <h2 class="cta-title">See your data differently.</h2>
+  <p class="cta-sub">Start for free. No credit card. Full features for 14 days.</p>
+  <div class="cta-btns">
+    <a href="#" class="btn-cyan">Create Free Account</a>
+    <a href="#" class="btn-ghost">Book a Demo</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><div class="logo-dot"></div>DataPulse</div>
+  <p>© 2026 DataPulse. Built with CSS, Flexbox & SVG.</p>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+    { threshold: 0.12 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
