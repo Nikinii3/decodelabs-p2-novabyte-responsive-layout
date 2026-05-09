@@ -337,7 +337,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   .work-grid{grid-template-columns:repeat(2,1fr)}
   .testi-grid{grid-template-columns:repeat(2,1fr)}
   .footer-grid{grid-template-columns:2fr 1fr 1fr}
-  .footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}
+  .footer-bottom{flex-direction:row;justify-content:space-between;text-align:center; flex-wrap:wrap;gap:0.5rem;}
 }
 @media(min-width:1024px){
   .navbar{padding:0 var(--sp-lg)}
@@ -351,7 +351,7 @@ footer { background:var(--surface); border-top:1px solid var(--border); padding:
   .testi-grid{grid-template-columns:repeat(3,1fr)}
   .testimonials-section{padding:var(--sp-2xl) var(--sp-lg)}
   .cta-section{padding:var(--sp-2xl) var(--sp-lg)}
-  footer{padding:var(--sp-xl) var(--sp-lg) var(--sp-md)}
+  .footer{padding:var(--sp-xl) var(--sp-lg) var(--sp-md)}
   .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}
 }
 @media(min-width:1280px){
